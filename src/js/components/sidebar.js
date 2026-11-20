@@ -1,3 +1,5 @@
+import eyeViewLogo from '../../assets/eye-view-logo.jpg';
+
 let controller;
 
 export function renderSidebar(profile, active = '') {
@@ -14,7 +16,7 @@ export function renderSidebar(profile, active = '') {
   return `
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <div class="brand-icon"><i class="bi bi-eyeglasses"></i></div>
+        <div class="brand-icon"><img src="${eyeViewLogo}" alt="Eye-View Logo"></div>
         <div><h5>EYE-VIEW</h5><small>OPTICAL CLINIC</small></div>
       </div>
       <div class="nav-label">MAIN MENU</div>

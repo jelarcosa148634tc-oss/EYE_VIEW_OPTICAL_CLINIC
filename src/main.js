@@ -9,6 +9,7 @@ import { renderCustomers } from './js/pages/customers.js';
 import { renderOrders } from './js/pages/orders.js';
 import { renderRepairs } from './js/pages/repairs.js';
 import { renderReports } from './js/pages/reports.js';
+import { renderStaff } from './js/pages/staff.js';
 import { renderSidebar, bindSidebar } from './js/components/sidebar.js';
 
 const app = document.querySelector('#app');
@@ -187,7 +188,6 @@ function renderComingSoon(profile, page) {
     orders: ['Orders', 'receipt'],
     repairs: ['Frame Repairs', 'tools'],
     reports: ['Sales & Reports', 'bar-chart'],
-    staff: ['Staff Management', 'person-gear']
   };
 
   const [title, icon] = pages[page] || ['Page', 'grid'];
@@ -260,7 +260,11 @@ async function navigateToPage(page, profile) {
     return;
   }
 
-  if (page === 'staff' && profile.role !== 'admin') return;
+  if (page === 'staff') {
+    if (profile.role !== 'admin') return;
+    await renderStaff(profile, nextPage => navigateToPage(nextPage, profile));
+    return;
+  }
 
   renderComingSoon(profile, page);
 }

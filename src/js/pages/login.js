@@ -1,11 +1,13 @@
 import { supabase } from '../supabase.js';
+import eyeViewLogo from '../../assets/eye-view-logo.jpg';
+import { renderStaffRegistration } from './register.js';
 
 export function renderLogin() {
   document.querySelector('#app').innerHTML = `
     <div class="login-page">
       <div class="login-card">
         <div class="login-logo">
-          <i class="bi bi-eyeglasses"></i>
+          <img src="${eyeViewLogo}" alt="Eye-View Optical Clinic">
         </div>
         <h2>Eye-View Clinic</h2>
         <p>Optical Clinic Management System</p>
@@ -24,17 +26,27 @@ export function renderLogin() {
           </button>
           <div id="loginMessage" class="mt-3"></div>
         </form>
+
+        <div class="text-center mt-3">
+          <button type="button" id="registerLink" class="btn btn-link">
+            Register as Staff
+          </button>
+        </div>
       </div>
     </div>
   `;
 
-  document.querySelector('#loginForm').addEventListener('submit', async (event) => {
+  document.querySelector('#registerLink').addEventListener('click', () => {
+    renderStaffRegistration(renderLogin);
+  });
+
+  document.querySelector('#loginForm').addEventListener('submit', async event => {
     event.preventDefault();
 
     const email = document.querySelector('#email').value.trim();
     const password = document.querySelector('#password').value;
     const message = document.querySelector('#loginMessage');
-    const button = event.target.querySelector('button');
+    const button = event.target.querySelector('button[type="submit"]');
 
     button.disabled = true;
     button.textContent = 'Signing in...';
