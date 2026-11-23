@@ -160,8 +160,18 @@ function renderTable() {
     return `
       <tr>
         <td>
-          <strong>${esc(product.name)}</strong>
-          <div class="small text-muted">${esc(product.sku || 'No SKU')}</div>
+          <div class="d-flex align-items-center gap-3">
+            <div style="width:55px;height:55px;flex-shrink:0;">
+              ${product.image_url ? `<img src="${esc(product.image_url)}" alt="${esc(product.name)}" class="rounded" style="width:55px;height:55px;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
+              <div class="rounded bg-light text-secondary align-items-center justify-content-center" style="width:55px;height:55px;display:${product.image_url ? 'none' : 'flex'};">
+                <i class="bi bi-image fs-4"></i>
+              </div>
+            </div>
+            <div>
+              <strong>${esc(product.name)}</strong>
+              <div class="small text-muted">${esc(product.sku || 'No SKU')}</div>
+            </div>
+          </div>
         </td>
         <td>${esc(category?.name || 'Uncategorized')}</td>
         <td><span class="badge bg-light text-dark">${esc(product.product_type)}</span></td>
@@ -283,6 +293,10 @@ function showProductForm(product = null) {
             <input class="form-control" type="url" name="image_url"
               value="${esc(product?.image_url || '')}"
               placeholder="https://example.com/product.jpg">
+            <label class="form-label mt-3">Or Upload Product Image</label>
+            <input class="form-control" type="file" name="image_file"
+              accept="image/jpeg,image/png,image/webp">
+            <small class="text-muted">JPG, PNG or WEBP. Maximum 10 MB.</small>
           </div>
 
           <div class="col-12">
@@ -407,6 +421,18 @@ async function saveProduct(event) {
   const form = event.target;
   const button = form.querySelector('button[type="submit"]');
   const values = new FormData(form);
+  const imageFile = values.get('image_file');
+
+  if (imageFile && imageFile.size > 0) {
+    if (imageFile.size > 10 * 1024 * 1024) {
+      showMessage('Image must not exceed 10 MB.', 'danger');
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(imageFile.type)) {
+      showMessage('Please upload a JPG, PNG, or WEBP image.', 'danger');
+      return;
+    }
+  }
 
   const product = {
     name: String(values.get('name')).trim(),
@@ -430,6 +456,31 @@ async function saveProduct(event) {
 
   button.disabled = true;
   button.textContent = 'Saving...';
+
+  if (imageFile && imageFile.size > 0) {
+    const safeName = imageFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filePath = `products/${Date.now()}-${safeName}`;
+
+    const { data: uploaded, error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, imageFile, {
+        contentType: imageFile.type,
+        upsert: false
+      });
+
+    if (uploadError) {
+      button.disabled = false;
+      button.textContent = editingId ? 'Save Changes' : 'Add Product';
+      showMessage(uploadError.message, 'danger');
+      return;
+    }
+
+    const { data: publicUrl } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(uploaded.path);
+
+    product.image_url = publicUrl.publicUrl;
+  }
 
   const result = editingId
     ? await supabase.from('products').update(product).eq('id', editingId)

@@ -160,7 +160,7 @@ export async function renderInventory(profile, goDashboard) {
             <h5 class="card-heading mb-1">Current Stock</h5>
             <small class="text-muted">Monitor quantities and stock status.</small>
           </div>
-          <button class="btn btn-outline-primary btn-sm" id="refreshInventory">
+          <button class="btn btn-outline-secondary btn-sm" id="refreshInventory">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
         </div>

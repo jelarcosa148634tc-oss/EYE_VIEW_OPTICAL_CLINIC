@@ -60,7 +60,7 @@ export async function renderStaff(profile, goBack) {
       <div class="content-card">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="card-heading mb-0">Staff Directory</h5>
-          <button id="refreshStaff" class="btn btn-outline-primary btn-sm">
+          <button id="refreshStaff" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-clockwise"></i> Refresh
           </button>
         </div>
