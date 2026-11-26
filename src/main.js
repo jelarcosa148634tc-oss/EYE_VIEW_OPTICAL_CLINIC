@@ -283,10 +283,15 @@ async function startApp() {
       .from('profiles')
       .select('id,full_name,role')
       .eq('id', data.session.user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError) throw profileError;
-    if (!profile) throw new Error('Profile not found.');
+
+    if (!profile) {
+      await supabase.auth.signOut();
+      renderLogin();
+      return;
+    }
 
     const dashboard = await getDashboardData();
     renderDashboard(profile, dashboard);
